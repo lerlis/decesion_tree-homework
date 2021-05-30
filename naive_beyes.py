@@ -3,6 +3,7 @@
 @Author  : Jupiter (朱比特)
 @FileName: Navie_Bayes.py
 @Blog    :https://blog.csdn.net/qq_1067857137
+https://blog.csdn.net/weixin_52328678/article/details/115628248
 欢迎大家一起交流！！！
 ************************************************
 naive_beyes.py是在上述代码博客代码的基础上修改而来
@@ -79,8 +80,8 @@ def get_dataset():
     dict4 = {}
     # i1 = object.iloc[100:150, 0:5]
     # test_set = i1.values.tolist()  # 测试集
-    test_set = object[105:150]
-    train_set = object[0:105]
+    test_set = object[90:150]
+    train_set = object[0:90]
     # m1 = object.iloc[0:100, [0, 4]]
     # m2 = m1.values.tolist()
     m2 = []

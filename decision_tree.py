@@ -100,13 +100,17 @@ def choosebestattribute(x_train, y_train):
     best_info_gain = 0
     best_feature = -1
     best_mid = 0
+    acc_info_gain = []
+    acc_mid = []
     for i in range(num_attributes):
         infoGain, mid = seriescalbestIG(x_train, y_train, i, base_entropy)
+        acc_info_gain.append(infoGain)
+        acc_mid.append(mid)
         if infoGain > best_info_gain:  # 找到最优的Information Gain所属的类别和划分条件
             best_mid = mid
             best_feature = i
             best_info_gain = infoGain
-    return best_feature, best_mid
+    return best_feature, best_mid, acc_info_gain, acc_mid
 
 
 def seriescalbestIG(x_train, y_train, col, base_entropy):
@@ -196,13 +200,6 @@ def tree_creator(x_train, y_train, Attributes, label, threshold):
     :return:
     """
     global node, leaf
-    node += 1
-    # 当标签中只剩下一种标签时，说明分类可以结束了，终止节点(叶子节点)直接存入一个字符串
-    if y_train.count(y_train[0]) == len(y_train):
-        leaf += 1
-        print('LEAF:第%s个叶节点' % leaf, '下包含的数据类别和个数为:', label[y_train[0]], len(y_train)
-              , '\n', y_train)
-        return '%s:%s' % (leaf, label[y_train[0]])
 
     num_of_label = collections.defaultdict(int)
     for i in range(len(y_train)):
@@ -220,9 +217,18 @@ def tree_creator(x_train, y_train, Attributes, label, threshold):
             else:
                 continue
 
+    # 当标签中只剩下一种标签时，说明分类可以结束了，终止节点(叶子节点)直接存入一个字符串
+    if y_train.count(y_train[0]) == len(y_train):
+        leaf += 1
+        print('LEAF:第%s个叶节点' % leaf, '下包含的数据类别和个数为:', label[y_train[0]], len(y_train)
+              , '\n', y_train)
+        return '%s:%s' % (leaf, label[y_train[0]])
+
+    node += 1
     # 选择当前节点或者所剩数据下的最优属性以及划分
-    feature, mid = choosebestattribute(x_train, y_train)
+    feature, mid, acc_Info_gain, acc_mid_t = choosebestattribute(x_train, y_train)
     print('NODE:第%s个结点,以维度%s划分' % (node, feature), '即为', Attributes[feature], '中间值为：', mid)
+    print('各个Attribute的IG值为', acc_Info_gain, '各个Attribute的划分点为', acc_mid_t)
     # 生成决策树
     best_feature_label = str(node) + ':' + str(Attributes[feature]) + '=' + str(mid)
 
@@ -323,17 +329,19 @@ if __name__ == "__main__":
     Attributes = ['sepal length', 'sepal width', 'petal length', 'petal width']
     fil_data = data_filter(data_origin[:], label)
     # print(fil_data)
-    x_train, y_train, x_test, y_test = data_split(fil_data, ratio=0.7, set_seed=1824)
+    x_train, y_train, x_test, y_test = data_split(fil_data, ratio=0.6, set_seed=1824)
     # print('1:', x_train)
     # print('2:', y_train)
     # print('3:', x_test)
     # print('4:', y_test)
     ShannonEnt = calinfoEntropy(x_train, y_train)
     # print('训练集信息熵：', ShannonEnt)
-    feature, mid = choosebestattribute(x_train, y_train)
-    # print('第一次分类维度：', feature, '即为', Attributes[feature],'中间值划分：', mid)
+    feature, mid, acc_IG, acc_t = choosebestattribute(x_train, y_train)
+    # print('第1次分类维度：', feature, '即为', Attributes[feature],'中间值划分：', mid)
+    # print('第1次划分的IG值为', acc_IG, '第1次各属性的划分点为', acc_t)
     print("***************************开始训练**************************")
     myTree = tree_creator(x_train, y_train, Attributes, label, threshold=0)
+    print(myTree)
     treePlotter.createPlot(myTree)
     print("***************************测试部分**************************")
     matrix = get_true_false(myTree, x_test, y_test, label, Attributes)
