@@ -211,7 +211,7 @@ def tree_creator(x_train, y_train, Attributes, label, threshold):
             if a <= threshold:
                 y_show, y_not_show = thres_select(num_of_label)
                 leaf += 1
-                print('LEAF:第%s个叶节点' % leaf, '下包含的数据类别和个数为:', y_show, y_not_show, len(y_train)
+                print('LEAF:第%s个叶节点' % leaf, '下包含的数据类别和个数为:', label[y_show], label[y_not_show], len(y_train)
               , '\n', y_train)
                 return '%s:%s' % (leaf, label[y_show])
             else:
